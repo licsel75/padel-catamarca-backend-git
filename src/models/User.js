@@ -1,25 +1,14 @@
 import mongoose from 'mongoose';
 
-const torneoSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
-  fecha: { type: Date, required: true },
-  clubes: [{ 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Club', 
-    required: true 
-  }],
-  usuario: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
-  },
-  categorias: [{ type: String }],
-  auspiciantes: [{ type: String }],
-  estado: { 
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  rol: { 
     type: String, 
-    enum: ['abierto', 'en curso', 'finalizado'], 
-    default: 'abierto' 
+    enum: ['admin', 'organizador', 'jugador'], 
+    default: 'jugador' 
   }
 }, { timestamps: true });
 
-export default mongoose.model('Torneo', torneoSchema);
+export default mongoose.model('User', userSchema);

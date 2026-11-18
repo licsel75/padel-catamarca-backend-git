@@ -2,22 +2,18 @@ import mongoose from 'mongoose';
 
 const torneoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
-  fecha: { type: Date, required: true },
-  
-  // 👇 CAMBIO CLAVE: Ahora es un array de referencias a Clubes
+  fechaInicio: { type: Date, required: true }, // Nuevo
+  fechaFin: { type: Date, required: true },    // Nuevo
   clubes: [{ 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Club', 
     required: true 
   }],
-  
-  // El organizador del torneo (dueño de club o independiente)
   usuario: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User', 
     required: true 
   },
-  
   categorias: [{ type: String }],
   auspiciantes: [{ type: String }],
   estado: { 

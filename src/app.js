@@ -7,6 +7,9 @@ import authRoutes from './routes/authRoutes.js';
 import { protect } from './middlewares/authMiddleware.js';
 import clubRoutes from './routes/clubRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import torneoRoutes from './routes/torneoRoutes.js';
+
+
 
 
 
@@ -37,6 +40,9 @@ app.get('/', (req, res) => {
 app.get('/api/test-protegida', protect, (req, res) => {
   res.json({ mensaje: `¡Hola ${req.user.nombre}! Estás viendo una ruta protegida 🎾` });
 });
+
+
+app.use('/api/torneos', torneoRoutes);
 
 //  Definino el puerto y levantamos el servidor
 const PORT = process.env.PORT || 3000;

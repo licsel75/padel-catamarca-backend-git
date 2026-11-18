@@ -11,7 +11,8 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    const torneos = await torneoService.getTorneos();
+    // Le pasamos req.query al servicio (ej: { categoria: '1ra', club: '...' })
+    const torneos = await torneoService.getTorneos(req.query);
     res.json(torneos);
   } catch (error) {
     res.status(500).json({ error: error.message });

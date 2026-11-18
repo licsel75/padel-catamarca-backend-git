@@ -25,13 +25,24 @@ export const createTorneo = async (data, userId) => {
 };
 
 
+export const getTorneos = async (filtros) => {
+  // Creamos un objeto de consulta vacío
+  let query = {};
 
-export const getTorneos = async () => {
-  // populate trae los datos de los clubes y del organizador
-  return await Torneo.find()
+  // Filtro 1: Por categoría (si el query trae "categoria")
+  if (filtros.categoria) {
+    query.categorias = { $in: [filtros.categoria] };
+  }
+
+  // Filtro 2: Por club (si el query trae "club")
+  if (filtros.club) {
+    query.clubes = { $in: [filtros.club] };
+  }
+
+  return await Torneo.find(query)
     .populate('clubes', 'nombre direccion')
     .populate('usuario', 'nombre email')
-    .sort({ fecha: 1 }); // Ordenados por fecha (los más próximos primero)
+    .sort({ fechaInicio: 1 }); // Ordenamos por fecha de inicio
 };
 
 export const getTorneoById = async (id) => {

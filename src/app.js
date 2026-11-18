@@ -8,6 +8,7 @@ import { protect } from './middlewares/authMiddleware.js';
 import clubRoutes from './routes/clubRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import torneoRoutes from './routes/torneoRoutes.js';
+import favoritoRoutes from './routes/favoritoRoutes.js';
 
 
 
@@ -43,6 +44,7 @@ app.get('/api/test-protegida', protect, (req, res) => {
 
 
 app.use('/api/torneos', torneoRoutes);
+app.use('/api/favoritos', favoritoRoutes);
 
 //  Definino el puerto y levantamos el servidor
 const PORT = process.env.PORT || 3000;

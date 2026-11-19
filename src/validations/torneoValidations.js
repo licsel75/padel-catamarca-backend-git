@@ -26,12 +26,19 @@ export const validateTorneo = [
   body('categorias')
     .isArray({ min: 1 }).withMessage('Debe haber al menos una categoría'),
 
-  // Middleware para atrapar los errores y devolver un 400
+   body('premio')
+    .optional()
+    .isLength({ max: 50 }).withMessage('El premio no puede superar los 50 caracteres'),
+  
+  // Middleware para atrapar los errores
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errores: errors.array() });
     }
+     
+
+  
     next();
   }
 ];

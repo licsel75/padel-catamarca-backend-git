@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 
 const torneoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
-  fechaInicio: { type: Date, required: true }, // Nuevo
-  fechaFin: { type: Date, required: true },    // Nuevo
+  fechaInicio: { type: Date, required: true },
+  fechaFin: { type: Date, required: true },
   clubes: [{ 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Club', 
@@ -16,6 +16,11 @@ const torneoSchema = new mongoose.Schema({
   },
   categorias: [{ type: String }],
   auspiciantes: [{ type: String }],
+  //  NUEVO CAMPO
+  premio: { 
+    type: String, 
+    maxLength: 50 
+  },
   estado: { 
     type: String, 
     enum: ['abierto', 'en curso', 'finalizado'], 

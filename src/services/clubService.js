@@ -1,17 +1,23 @@
 import Club from '../models/Club.js';
 
-// Crear un club
-export const createClub = async (data, userId) => {
+// Crear un club (máximo 5 para organizadores/dueños, ilimitado para admin)
+export const createClub = async (data, user) => {
+  if (user.rol !== 'admin') {
+    const cantidadClubes = await Club.countDocuments({ usuario: user.id });
+    if (cantidadClubes >= 5) {
+      throw new Error('Alcanzaste el límite máximo de 5 clubes permitidos por organizador.');
+    }
+  }
+
   const nuevoClub = await Club.create({
     ...data,
-    usuario: userId // Asignamos el ID del creador
+    usuario: user.id
   });
   return nuevoClub;
 };
 
 // Obtener todos los clubes
 export const getClubes = async () => {
-  // .populate trae los datos del usuario en lugar de solo el ID
   return await Club.find().populate('usuario', 'nombre email'); 
 };
 
@@ -22,16 +28,26 @@ export const getClubById = async (id) => {
   return club;
 };
 
-// Actualizar un club
-export const updateClub = async (id, data) => {
-  const clubActualizado = await Club.findByIdAndUpdate(id, data, { new: true });
-  if (!clubActualizado) throw new Error('Club no encontrado');
-  return clubActualizado;
+// Actualizar un club (solo dueño o admin)
+export const updateClub = async (id, data, user) => {
+  const club = await Club.findById(id);
+  if (!club) throw new Error('Club no encontrado');
+
+  if (user.rol !== 'admin' && club.usuario.toString() !== user.id) {
+    throw new Error('No tenés permiso para editar un club que no creaste');
+  }
+
+  return await Club.findByIdAndUpdate(id, data, { new: true });
 };
 
-// Borrar un club
-export const deleteClub = async (id) => {
-  const club = await Club.findByIdAndDelete(id);
+// Borrar un club (solo dueño o admin)
+export const deleteClub = async (id, user) => {
+  const club = await Club.findById(id);
   if (!club) throw new Error('Club no encontrado');
-  return club;
+
+  if (user.rol !== 'admin' && club.usuario.toString() !== user.id) {
+    throw new Error('No tenés permiso para eliminar un club que no creaste');
+  }
+
+  return await Club.findByIdAndDelete(id);
 };

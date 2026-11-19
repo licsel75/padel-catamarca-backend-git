@@ -19,9 +19,9 @@ const crearAdmin = async () => {
     const hashedPassword = await bcrypt.hash('admin123', salt);
 
     await User.create({
-      nombre: 'Admin General',
+      nombre: 'Admin General 2',
       email: 'admin@padel.com',
-      password: hashedPassword,
+      password: hashedPassword, // 
       rol: 'admin',
       rolAprobado: true
     });

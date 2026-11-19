@@ -11,7 +11,6 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    // Le pasamos req.query al servicio (ej: { categoria: '1ra', club: '...' })
     const torneos = await torneoService.getTorneos(req.query);
     res.json(torneos);
   } catch (error) {
@@ -30,7 +29,7 @@ export const getOne = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const torneo = await torneoService.updateTorneo(req.params.id, req.body);
+    const torneo = await torneoService.updateTorneo(req.params.id, req.body, req.user);
     res.json(torneo);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -39,9 +38,9 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    await torneoService.deleteTorneo(req.params.id);
+    await torneoService.deleteTorneo(req.params.id, req.user);
     res.json({ mensaje: 'Torneo eliminado correctamente' });
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 };

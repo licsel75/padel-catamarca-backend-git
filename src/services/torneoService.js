@@ -2,13 +2,11 @@ import Torneo from '../models/Torneo.js';
 import Club from '../models/Club.js';
 
 export const createTorneo = async (data, userId) => {
-  // 1. Validar que los clubes existan
   const clubesExisten = await Club.find({ '_id': { $in: data.clubes } });
   if (clubesExisten.length !== data.clubes.length) {
     throw new Error('Uno o más clubes no existen');
   }
 
-  // 2. Validar fechas
   const inicio = new Date(data.fechaInicio);
   const fin = new Date(data.fechaFin);
   
@@ -16,7 +14,6 @@ export const createTorneo = async (data, userId) => {
     throw new Error('La fecha de fin no puede ser anterior a la fecha de inicio');
   }
 
-  // 3. Crear el torneo
   const nuevoTorneo = await Torneo.create({
     ...data,
     usuario: userId
@@ -24,17 +21,13 @@ export const createTorneo = async (data, userId) => {
   return nuevoTorneo;
 };
 
-
 export const getTorneos = async (filtros) => {
-  // Creamos un objeto de consulta vacío
   let query = {};
 
-  // Filtro 1: Por categoría (si el query trae "categoria")
   if (filtros.categoria) {
     query.categorias = { $in: [filtros.categoria] };
   }
 
-  // Filtro 2: Por club (si el query trae "club")
   if (filtros.club) {
     query.clubes = { $in: [filtros.club] };
   }
@@ -42,7 +35,7 @@ export const getTorneos = async (filtros) => {
   return await Torneo.find(query)
     .populate('clubes', 'nombre direccion')
     .populate('usuario', 'nombre email')
-    .sort({ fechaInicio: 1 }); // Ordenamos por fecha de inicio
+    .sort({ fechaInicio: 1 });
 };
 
 export const getTorneoById = async (id) => {
@@ -53,14 +46,24 @@ export const getTorneoById = async (id) => {
   return torneo;
 };
 
-export const updateTorneo = async (id, data) => {
-  const torneoActualizado = await Torneo.findByIdAndUpdate(id, data, { new: true });
-  if (!torneoActualizado) throw new Error('Torneo no encontrado');
-  return torneoActualizado;
+export const updateTorneo = async (id, data, user) => {
+  const torneo = await Torneo.findById(id);
+  if (!torneo) throw new Error('Torneo no encontrado');
+
+  if (user.rol !== 'admin' && torneo.usuario.toString() !== user.id) {
+    throw new Error('No tenés permiso para editar un torneo que no creaste');
+  }
+
+  return await Torneo.findByIdAndUpdate(id, data, { new: true });
 };
 
-export const deleteTorneo = async (id) => {
-  const torneo = await Torneo.findByIdAndDelete(id);
+export const deleteTorneo = async (id, user) => {
+  const torneo = await Torneo.findById(id);
   if (!torneo) throw new Error('Torneo no encontrado');
-  return torneo;
+
+  if (user.rol !== 'admin' && torneo.usuario.toString() !== user.id) {
+    throw new Error('No tenés permiso para eliminar un torneo que no creaste');
+  }
+
+  return await Torneo.findByIdAndDelete(id);
 };

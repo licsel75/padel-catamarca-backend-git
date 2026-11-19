@@ -6,12 +6,16 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   rol: { 
     type: String, 
-    enum: ['admin', 'dueño_club', 'organizador', 'jugador'], // <-- Nuevos roles
+    enum: ['admin', 'dueño_club', 'organizador', 'jugador'],
     default: 'jugador' 
   },
   rolAprobado: {
     type: Boolean,
     default: true // Jugadores true, organizadores/dueños false hasta que el admin apruebe
+  },
+  bloqueado: {
+    type: Boolean,
+    default: false // El admin puede cambiar esto a true para bloquear el acceso
   }
 }, { timestamps: true });
 

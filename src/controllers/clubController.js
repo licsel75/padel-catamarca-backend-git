@@ -2,7 +2,6 @@ import * as clubService from '../services/clubService.js';
 
 export const create = async (req, res) => {
   try {
-    // Pasamos req.user completo para verificar rol y límite de 5 clubes
     const club = await clubService.createClub(req.body, req.user);
     res.status(201).json(club);
   } catch (error) {
@@ -12,7 +11,7 @@ export const create = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    const clubes = await clubService.getClubes();
+    const clubes = await clubService.getClubes(req.query);
     res.json(clubes);
   } catch (error) {
     res.status(500).json({ error: error.message });

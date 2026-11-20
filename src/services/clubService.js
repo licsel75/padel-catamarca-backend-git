@@ -17,8 +17,12 @@ export const createClub = async (data, user) => {
 };
 
 // Obtener todos los clubes
-export const getClubes = async () => {
-  return await Club.find().populate('usuario', 'nombre email'); 
+export const getClubes = async (filtros = {}) => {
+  const query = {};
+  if (filtros.departamento && filtros.departamento !== 'Todos') {
+    query.departamento = filtros.departamento;
+  }
+  return await Club.find(query).populate('usuario', 'nombre email');
 };
 
 // Obtener un club por ID
@@ -51,3 +55,4 @@ export const deleteClub = async (id, user) => {
 
   return await Club.findByIdAndDelete(id);
 };
+

@@ -9,6 +9,9 @@ import clubRoutes from './routes/clubRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import torneoRoutes from './routes/torneoRoutes.js';
 import favoritoRoutes from './routes/favoritoRoutes.js';
+import profesorRoutes from './routes/profesorRoutes.js';
+// ...
+
 
 
 
@@ -31,6 +34,7 @@ app.use(express.json()); // Permite que nuestro servidor entienda y procese JSON
 
 app.use('/api/users', userRoutes);
 app.use('/api/clubes', clubRoutes);
+app.use('/api/profesores', profesorRoutes);
 
 // Una ruta de prueba (para saber si el servidor está vivo)
 app.get('/', (req, res) => {

@@ -105,3 +105,42 @@ export const toggleBloqueoUsuario = async (req, res) => {
     res.status(400).json({ error: 'Error al cambiar estado de bloqueo' });
   }
 };
+
+// Crear un nuevo usuario directamente desde el Panel de Administración (sin desloguearse)
+export const createUser = async (req, res) => {
+  try {
+    const { nombre, email, password, rol, rolAprobado } = req.body;
+
+    if (!nombre || !email || !password) {
+      return res.status(400).json({ error: 'Nombre, email y contraseña son obligatorios' });
+    }
+
+    if (password.trim().length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
+    const emailExiste = await User.findOne({ email: email.toLowerCase().trim() });
+    if (emailExiste) {
+      return res.status(400).json({ error: 'Ese email ya está registrado' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password.trim(), salt);
+
+    const nuevoUsuario = await User.create({
+      nombre: nombre.trim(),
+      email: email.toLowerCase().trim(),
+      password: passwordHash,
+      rol: rol || 'jugador',
+      // Si el admin lo crea, por defecto queda aprobado (salvo que explícitamente envíe false)
+      rolAprobado: typeof rolAprobado === 'boolean' ? rolAprobado : true
+    });
+
+    const userSinPassword = nuevoUsuario.toObject();
+    delete userSinPassword.password;
+
+    res.status(201).json({ mensaje: 'Usuario creado con éxito', user: userSinPassword });
+  } catch (error) {
+    res.status(400).json({ error: error.message || 'Error al crear el usuario' });
+  }
+};

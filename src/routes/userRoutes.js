@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  createUser,
   getAllUsers,
   getUserById,
   updateUser,
@@ -12,6 +13,7 @@ import { authorize } from '../middlewares/roleMiddleware.js';
 const router = express.Router();
 
 // Todas estas rutas están doblemente protegidas: requieren JWT válido y rol 'admin'
+router.post('/', protect, authorize('admin'), createUser);
 router.get('/', protect, authorize('admin'), getAllUsers);
 router.get('/:id', protect, authorize('admin'), getUserById);
 router.put('/:id', protect, authorize('admin'), updateUser);

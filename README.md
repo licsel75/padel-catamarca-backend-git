@@ -58,7 +58,7 @@ Pasos
 Clonar el repositorio:
 
 bash
-git clone https://github.com/<tu-usuario>/padel-catamarca-backend.git
+git clone https://github.com/<licsel75>/padel-catamarca-backend.git
 cd padel-catamarca-backend
 Instalar las dependencias:
 

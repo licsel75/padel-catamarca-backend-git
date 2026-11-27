@@ -35,3 +35,12 @@ Este es el servidor (API RESTful) para la plataforma de gestión de clubes, torn
 2. Instalar las dependencias:
    ```bash
    pnpm install
+
+## 🚀 Deploy en Producción
+*   **Frontend (Netlify):** https://catamarcapadel.netlify.app/
+*   **Backend API (Render):**  https://padel-catamarca-api.onrender.com
+
+## 🔐 Credenciales de Prueba 
+*   **Email:** `admin@padel.com`
+*   **Contraseña:** `admin123`
+*   *(Nota: El Backend en Render puede tardar ~50 segundos en despertar si estuvo inactivo).*

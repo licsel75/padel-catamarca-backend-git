@@ -1,6 +1,6 @@
 import PerfilProfesor from '../models/PerfilProfesor.js';
 
-// 1. OBTENER TODOS LOS ANUNCIOS ACTIVOS (Para la vidriera pública)
+//  OBTENER TODOS LOS ANUNCIOS ACTIVOS (Para la vidriera pública)
 export const getPerfilesActivos = async () => {
   // Traigo solo los perfiles activos y populo el nombre del usuario y los clubes donde enseña
   return await PerfilProfesor.find({ activo: true })
@@ -9,24 +9,32 @@ export const getPerfilesActivos = async () => {
     .sort({ updatedAt: -1 });
 };
 
-// 2. OBTENER EL PERFIL DEL PROFESOR LOGUEADO (Para precargar su formulario en Mi Panel)
+//  OBTENER EL PERFIL DEL PROFESOR LOGUEADO (Para precargar su formulario en Mi Panel)
 export const getMiPerfil = async (usuarioId) => {
   return await PerfilProfesor.findOne({ usuario: usuarioId })
     .populate('clubes', 'nombre departamento');
 };
 
-// 3. CREAR O ACTUALIZAR EL ANUNCIO (Upsert: si no existe lo crea, si existe lo actualiza)
+//  CREAR O ACTUALIZAR EL ANUNCIO (Upsert: si no existe lo crea, si existe lo actualiza)
 export const guardarMiPerfil = async (data, user) => {
-  // Verifico que el profesor tenga su cuenta aprobada por el administrador antes de publicar
   if (user.rol !== 'admin' && !user.rolAprobado) {
     throw new Error('Tu cuenta de profesor aún está pendiente de aprobación por un administrador.');
   }
 
-  // Busco si este usuario ya tiene un perfil creado previamente
+  // 1. Definimos el valor de esDestacado (por defecto lo que venga en data, o false)
+  let esDestacadoFinal = data.esDestacado || false;
+
+  // 2. SEGURIDAD: Si el usuario NO es admin, ignoramos lo que mande y forzamos el valor original
+  if (user.rol !== 'admin') {
+    const perfilExistente = await PerfilProfesor.findOne({ usuario: user.id });
+    // Si ya existía, mantenemos su valor anterior. Si es nuevo, es false.
+    esDestacadoFinal = perfilExistente ? perfilExistente.esDestacado : false;
+  }
+
   let perfil = await PerfilProfesor.findOne({ usuario: user.id });
 
   if (perfil) {
-    // Si ya existe, actualizo sus campos manteniendo su propiedad
+    // Actualizo los campos
     perfil.titulo = data.titulo;
     perfil.estudios = data.estudios || '';
     perfil.clubes = data.clubes || [];
@@ -35,12 +43,12 @@ export const guardarMiPerfil = async (data, user) => {
     perfil.telefono = data.telefono;
     perfil.descripcion = data.descripcion || '';
     perfil.activo = data.activo !== undefined ? data.activo : true;
+    perfil.esDestacado = esDestacadoFinal; //  ASIGNAMOS EL VALOR SEGURO
 
     await perfil.save();
     return perfil;
   }
 
-  // Si es la primera vez que publica, creo el documento asociado a su ID de usuario
   const nuevoPerfil = await PerfilProfesor.create({
     usuario: user.id,
     titulo: data.titulo,
@@ -50,13 +58,14 @@ export const guardarMiPerfil = async (data, user) => {
     diasHorarios: data.diasHorarios,
     telefono: data.telefono,
     descripcion: data.descripcion || '',
-    activo: true
+    activo: true,
+    esDestacado: esDestacadoFinal // ASIGNAMOS EL VALOR SEGURO
   });
 
   return nuevoPerfil;
 };
 
-// 4. ELIMINAR ANUNCIO (Solo el dueño del perfil o un administrador)
+// ELIMINAR ANUNCIO (Solo el dueño del perfil o un administrador)
 export const eliminarPerfil = async (id, user) => {
   const perfil = await PerfilProfesor.findById(id);
   if (!perfil) {
@@ -69,4 +78,21 @@ export const eliminarPerfil = async (id, user) => {
   }
 
   await PerfilProfesor.findByIdAndDelete(id);
+};
+
+//  MARCAR/DESMARCAR COMO DESTACADO (Solo admin)
+export const toggleDestacadoProfesor = async (id, user) => {
+  // Verificamos que sea admin
+  if (user.rol !== 'admin') {
+    throw new Error('Solo un administrador puede destacar profesores');
+  }
+
+  const perfil = await PerfilProfesor.findById(id);
+  if (!perfil) throw new Error('Perfil de profesor no encontrado');
+
+  // Invertimos el valor (si era true, pasa a false, y viceversa)
+  perfil.esDestacado = !perfil.esDestacado;
+  await perfil.save();
+  
+  return perfil;
 };

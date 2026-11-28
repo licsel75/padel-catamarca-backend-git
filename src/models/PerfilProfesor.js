@@ -51,7 +51,20 @@ const perfilProfesorSchema = new mongoose.Schema({
   activo: {
     type: Boolean,
     default: true
+  },
+
+ 
+ 
+  esDestacado: {
+    type: Boolean,
+    default: false
   }
+
+
+
+
+
+
 }, { timestamps: true });
 
 export default mongoose.model('PerfilProfesor', perfilProfesorSchema);
